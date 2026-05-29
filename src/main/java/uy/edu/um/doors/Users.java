@@ -1,12 +1,12 @@
 package uy.edu.um.doors;
 
-public class users {
+public class Users {
 
     private int uid;
     private String alias;
     private String type;
 
-    public users (int uid, String alias, String type){
+    public Users(int uid, String alias, String type){
         this.uid=uid;
         this.alias=alias;
         this.type=type;

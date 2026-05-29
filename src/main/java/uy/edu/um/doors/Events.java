@@ -1,17 +1,15 @@
 package uy.edu.um.doors;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 
-public class events {
+public class Events {
 
 
     private int pid;
     private String type;
     private ArrayList<String> instructions;
 
-    public events (int pid, String type,ArrayList<String> instructions){
+    public Events (int pid, String type,ArrayList<String> instructions){
         this.pid= pid;
         this.type=type;
         this.instructions= new ArrayList<String>(instructions);

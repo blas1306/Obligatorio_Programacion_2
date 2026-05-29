@@ -1,6 +1,6 @@
 package uy.edu.um.doors;
 
-public class process {
+public class Process {
 
     private int pid;
     private int uid;
@@ -8,7 +8,7 @@ public class process {
     private int priority;
     private String estado;
 
-    public process (int pid, int uid, String name){
+    public Process (int pid, int uid, String name){
 
         this.pid=pid;
         this.uid=uid;
