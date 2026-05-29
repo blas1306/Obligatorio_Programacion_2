@@ -6,7 +6,7 @@ public class Process {
     private int uid;
     private String name;
     private int priority;
-    private String estado;
+    private String status;
 
     public Process (int pid, int uid, String name){
 
@@ -14,7 +14,7 @@ public class Process {
         this.uid=uid;
         this.name=name;
         this.priority=0;
-        this.estado="NEW";
+        this.status="NEW";
     }
 
     public void setPid(int pid) {
@@ -41,12 +41,12 @@ public class Process {
         this.uid = uid;
     }
 
-    public String getEstado() {
-        return estado;
+    public String getStatus() {
+        return status;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getName() {

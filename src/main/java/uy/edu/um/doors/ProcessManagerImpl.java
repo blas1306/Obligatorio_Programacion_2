@@ -1,6 +1,20 @@
 package uy.edu.um.doors;
 
+import uy.edu.um.tad.*;
+import uy.edu.um.tad.hash.MyHashImpl;
+import uy.edu.um.tad.queue.MyQueueImpl;
+import uy.edu.um.tad.stack.MyStackImpl;
+
 public class ProcessManagerImpl implements ProcessManager{
+
+    //Placeholder
+    private MyHashImpl userList;
+    private MyHashImpl processList;
+
+    private MyQueueImpl newProcesses;
+    private MyHashImpl pendingProcesses;
+    private MyStackImpl runningProcess;
+    private MyStackImpl finishedProcesses;
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
 
