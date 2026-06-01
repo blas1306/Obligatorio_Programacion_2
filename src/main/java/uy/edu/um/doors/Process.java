@@ -1,5 +1,7 @@
 package uy.edu.um.doors;
 
+import java.util.ArrayList;
+
 public class Process {
 
     private int pid;
@@ -7,14 +9,17 @@ public class Process {
     private String name;
     private int priority;
     private String estado;
+    private ArrayList<Events> events;
 
-    public Process (int pid, int uid, String name){
+    public Process (int pid, int uid, String name, ArrayList<Events> events){
 
         this.pid=pid;
         this.uid=uid;
         this.name=name;
         this.priority=0;
         this.estado="NEW";
+        this.events=events;
+
     }
 
     public void setPid(int pid) {
@@ -57,8 +62,13 @@ public class Process {
         this.name = name;
     }
 
+    public void setEvents(ArrayList<Events> events) {
+        this.events = events;
+    }
 
-
+    public ArrayList<Events> getEvents() {
+        return events;
+    }
 
     private void catculatePrio(){
 

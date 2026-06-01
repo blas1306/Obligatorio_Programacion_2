@@ -8,8 +8,12 @@ import uy.edu.um.doors.ProcessManagerImpl;
 public class Main {
     public static void main(String[] args) {
 
-        ProcessConsole pc = new ProcessConsole(new ProcessManagerImpl());
-        pc.init();
+        //ProcessConsole pc = new ProcessConsole(new ProcessManagerImpl());
+        //pc.init();
+        ProcessManagerImpl omi=new ProcessManagerImpl();
+        omi.loadProcessAndUserData("process.csv", "users.csv");
+        System.out.println(omi.usuarios.toString());
+        System.out.println(omi.procesosNuevos);
 
     }
 }
