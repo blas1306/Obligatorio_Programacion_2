@@ -4,8 +4,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import uy.edu.um.Exceptions.ProcessosYaEnSistemas;
+import uy.edu.um.Exceptions.UsuarioYaEnSistema;
 import uy.edu.um.tad.*;
 import uy.edu.um.tad.hash.MyHashImpl;
+import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
@@ -13,15 +16,15 @@ public class ProcessManagerImpl implements ProcessManager{
 
     // TEMPORAL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      public ArrayList<Users> usuarios=new ArrayList<Users>();
-    public ArrayList<Process> procesosNuevos=new ArrayList<Process>();
+
 
 
     //Placeholder
-    private MyHashImpl userList;
-    private MyHashImpl processList;
+    private MyHashImpl userList=new MyHashImpl();
 
-    private MyQueueImpl newProcesses;
-    private MyHashImpl pendingProcesses;
+
+    private MyQueueImpl newProcesses=new MyQueueImpl();
+    private MyHeapImpl pendingProcesses;
     private MyStackImpl runningProcess;
     private MyStackImpl finishedProcesses;
 
@@ -55,8 +58,11 @@ public class ProcessManagerImpl implements ProcessManager{
 
 
 
-
-                procesosNuevos.add(new Process( Integer.parseInt(datos[0]),Integer.parseInt(datos[1]),datos[2],eventosTotales));//Integer.parseInt( pasa a int las cosas)
+                Process nuevoProcess=new Process( Integer.parseInt(datos[0]),Integer.parseInt(datos[1]),datos[2],eventosTotales);
+                if (newProcesses.contains(nuevoProcess)){
+                    throw new ProcessosYaEnSistemas("Proceso  ya en sistema");
+                }
+                newProcesses.enqueue(nuevoProcess);//Integer.parseInt( pasa a int las cosas)
             }
             LectorDeArchivo.close();
         }catch (NumberFormatException | IOException e ){
@@ -73,7 +79,11 @@ public class ProcessManagerImpl implements ProcessManager{
             LectorDeArchivo.readLine();
             while ((linea=LectorDeArchivo.readLine())!=null){
                 String[] datos= linea.split(";");//Separa la linea por los punto y comas
-                usuarios.add(new Users( Integer.parseInt(datos[0]),datos[1],datos[2]));//Integer.parseInt( pasa a int las cosas)
+                Users usuarioNuevo=new Users( Integer.parseInt(datos[0]),datos[1],datos[2]);
+                if (userList.contains(datos[0])){
+                    throw new UsuarioYaEnSistema("Usuario ya en sistema");
+                }
+                userList.put(Integer.parseInt(datos[0]),usuarioNuevo);//Integer.parseInt( pasa a int las cosas)
             }
             LectorDeArchivo.close();
         }catch (NumberFormatException | IOException e ){
