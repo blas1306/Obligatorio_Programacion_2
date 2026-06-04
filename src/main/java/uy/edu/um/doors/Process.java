@@ -2,7 +2,7 @@ package uy.edu.um.doors;
 
 import java.util.ArrayList;
 
-public class Process {
+public class Process implements Comparable<Process> {
 
     private int pid;
     private int uid;
@@ -70,8 +70,8 @@ public class Process {
         return events;
     }
 
-    private void catculatePrio(){
-
+    @Override
+    public int compareTo(Process o) {
+        return this.priority - o.priority;
     }
-
 }

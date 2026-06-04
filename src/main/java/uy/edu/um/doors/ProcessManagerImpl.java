@@ -3,12 +3,14 @@ package uy.edu.um.doors;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
 
 import uy.edu.um.Exceptions.ProcessosYaEnSistemas;
 import uy.edu.um.Exceptions.UsuarioYaEnSistema;
-import uy.edu.um.tad.*;
+//import uy.edu.um.tad.*;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
+import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
 import uy.edu.um.tad.stack.MyStackImpl;
 
@@ -23,8 +25,8 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyHashImpl userList=new MyHashImpl();
 
 
-    private MyQueueImpl newProcesses=new MyQueueImpl();
-    private MyHeapImpl pendingProcesses;
+    private MyQueueImpl<Process> newProcesses=new MyQueueImpl<>();
+    private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl(false);
     private MyStackImpl runningProcess;
     private MyStackImpl finishedProcesses;
 
@@ -96,8 +98,39 @@ public class ProcessManagerImpl implements ProcessManager{
 
 
     @Override
-    public void prepareProcesses() {
-        System.out.println("IMPLEMENTAR");
+    public void prepareProcesses() throws EmptyQueueException {
+        for (int i = 0; i < newProcesses.size(); i++) {
+            Process toPrepare = newProcesses.dequeue();
+            int cpuEvents = 0;
+            int ramEvents = 0;
+            int diskEvents = 0;
+            for (int j = 0; j < toPrepare.getEvents().size(); j++) {
+                if (Objects.equals(toPrepare.getEvents().get(j).getType(), "CPU")) {
+                    cpuEvents++;
+                } else if (Objects.equals(toPrepare.getEvents().get(j).getType(), "RAM")) {
+                    ramEvents++;
+                } else {
+                    diskEvents++;
+                }
+            }
+
+            int prioUser;
+            Users user = (Users) userList.get(toPrepare.getUid());
+            if (Objects.equals(user.getType(), "ADMIN")) {
+                prioUser = 32;
+            } else {
+                prioUser = 16;
+            }
+
+            int priority = (8*cpuEvents + 2*ramEvents + 2*diskEvents) / toPrepare.getEvents().size() + prioUser * toPrepare.getEvents().size();
+            toPrepare.setPriority(priority);
+            toPrepare.setStatus("PENDING");
+
+            //faltaria aca meterlo en el log aun
+
+            pendingProcesses.insert(toPrepare);
+        }
+        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
