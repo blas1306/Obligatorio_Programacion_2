@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import uy.edu.um.Exceptions.ProcessosYaEnSistemas;
 import uy.edu.um.Exceptions.UsuarioYaEnSistema;
 //import uy.edu.um.tad.*;
@@ -31,6 +35,17 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyStackImpl finishedProcesses;
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
+
+    private void writeLog(String message) {
+        String fileName = "DOORS_PROCESS_LOG_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        try (FileWriter writer = new FileWriter(fileName, true)) {
+            writer.write("[" + timestamp + "]: " + message + System.lineSeparator());
+        } catch (IOException e) {
+            System.out.println("Error escribiendo log: " + e.getMessage());
+        }
+    }
 
     @Override
     public void loadProcessAndUserData(String processCsvPath, String usersCsvPath) {
@@ -99,7 +114,9 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void prepareProcesses() throws EmptyQueueException {
-        for (int i = 0; i < newProcesses.size(); i++) {
+        int cantidad = newProcesses.size();
+
+        for (int i = 0; i < cantidad; i++) {
             Process toPrepare = newProcesses.dequeue();
             int cpuEvents = 0;
             int ramEvents = 0;
@@ -126,7 +143,13 @@ public class ProcessManagerImpl implements ProcessManager{
             toPrepare.setPriority(priority);
             toPrepare.setStatus("PENDING");
 
-            //faltaria aca meterlo en el log aun
+            writeLog(
+                    "NEW PENDING PROCESS: PID=" + toPrepare.getPid()
+                            + " | " + toPrepare.getName()
+                            + " | USER:" + user.getAlias()
+                            + " UID:" + user.getUid()
+                            + " | P=" + toPrepare.getPriority()
+            );
 
             pendingProcesses.insert(toPrepare);
         }
