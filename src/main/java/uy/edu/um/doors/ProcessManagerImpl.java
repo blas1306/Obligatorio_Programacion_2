@@ -15,6 +15,7 @@ import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.queue.EmptyQueueException;
 import uy.edu.um.tad.queue.MyQueueImpl;
+import uy.edu.um.tad.stack.EmptyStackException;
 import uy.edu.um.tad.stack.MyStackImpl;
 
 public class ProcessManagerImpl implements ProcessManager{
@@ -26,7 +27,7 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyQueueImpl<Process> newProcesses= new MyQueueImpl<>();
     private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl<>(false);
     private MyStackImpl<Process> runningProcess = new MyStackImpl<>();
-    private MyStackImpl finishedProcesses;
+    private MyStackImpl<Process> finishedProcesses = new MyStackImpl<>();
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
 
@@ -161,8 +162,41 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void finishProcessOk() {
-        System.out.println("IMPLEMENTAR");
+    public void finishProcessOk() throws EmptyStackException {
+        if (!runningProcess.isEmpty()) {
+            Process toFinish = runningProcess.pop();
+            toFinish.setStatus("FINISHED");
+            toFinish.setFinishedType("OK");
+
+            if (finishedProcesses.size() < MAX_FINISHED_PROCESS_ON_RAM) {
+                finishedProcesses.push(toFinish);
+                Process toLog = finishedProcesses.peek();
+
+                writeLog(
+                        "ENDING PROCESS:" + toLog.getPid()
+                                + " | STATE: " + toLog.getFinishedType()
+                );
+            } else {
+                StringBuilder overflowMsg = new StringBuilder();
+                while (!finishedProcesses.isEmpty()) {
+                    Process overflow = finishedProcesses.pop();
+                    Users user = (Users) userList.get(overflow.getUid());
+                    String tempMsg = "PID=" + overflow.getPid() + " " + overflow.getName() + " | STATE: " + overflow.getFinishedType() + " | USER: " + user + " UID: " + overflow.getUid() + "/n";
+                    overflowMsg.append(tempMsg);
+                }
+                writeLog(String.valueOf(overflowMsg));
+
+                finishedProcesses.push(toFinish);
+                Process toLog = finishedProcesses.peek();
+
+                writeLog(
+                        "ENDING PROCESS:" + toLog.getPid()
+                                + " | STATE: " + toLog.getFinishedType()
+                );
+            }
+        }
+
+        //System.out.println("IMPLEMENTAR");
     }
 
     @Override

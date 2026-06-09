@@ -10,6 +10,7 @@ public class Process implements Comparable<Process> {
     private int priority;
     private String status;
     private ArrayList<Events> events;
+    private String finishedType;
 
     public Process (int pid, int uid, String name, ArrayList<Events> events){
 
@@ -69,6 +70,10 @@ public class Process implements Comparable<Process> {
     public ArrayList<Events> getEvents() {
         return events;
     }
+
+    public void setFinishedType (String type) {this.finishedType = type;}
+
+    public String getFinishedType () {return finishedType;}
 
     @Override
     public int compareTo(Process o) {
