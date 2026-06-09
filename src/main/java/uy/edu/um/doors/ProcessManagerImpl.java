@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 
 import uy.edu.um.Exceptions.ProcessosYaEnSistemas;
 import uy.edu.um.Exceptions.UsuarioYaEnSistema;
-//import uy.edu.um.tad.*;
 import uy.edu.um.tad.hash.MyHashImpl;
 import uy.edu.um.tad.heap.MyHeapImpl;
 import uy.edu.um.tad.queue.EmptyQueueException;
@@ -20,18 +19,13 @@ import uy.edu.um.tad.stack.MyStackImpl;
 
 public class ProcessManagerImpl implements ProcessManager{
 
-    // TEMPORAL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     public ArrayList<Users> usuarios=new ArrayList<Users>();
-
-
 
     //Placeholder
     private MyHashImpl userList=new MyHashImpl();
 
-
-    private MyQueueImpl<Process> newProcesses=new MyQueueImpl<>();
-    private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl(false);
-    private MyStackImpl runningProcess;
+    private MyQueueImpl<Process> newProcesses= new MyQueueImpl<>();
+    private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl<>(false);
+    private MyStackImpl<Process> runningProcess = new MyStackImpl<>();
     private MyStackImpl finishedProcesses;
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
@@ -110,8 +104,6 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
 
-
-
     @Override
     public void prepareProcesses() throws EmptyQueueException {
         int cantidad = newProcesses.size();
@@ -153,12 +145,19 @@ public class ProcessManagerImpl implements ProcessManager{
 
             pendingProcesses.insert(toPrepare);
         }
-        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
     public void executeNextProcess() {
-        System.out.println("IMPLEMENTAR");
+
+        if (runningProcess.isEmpty()) {
+            Process toRun = pendingProcesses.remove();
+            toRun.setStatus("RUNNING");
+            runningProcess.push(toRun);
+            //Implementar log
+        } else {
+            System.out.println("ERROR, no se puede ejecutar más de un programa a la vez.");
+        }
     }
 
     @Override
