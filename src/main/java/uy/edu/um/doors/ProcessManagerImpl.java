@@ -42,6 +42,38 @@ public class ProcessManagerImpl implements ProcessManager{
         }
     }
 
+    private void saveFinishedProcess(Process toFinish) throws EmptyStackException {
+
+        if (finishedProcesses.size() < MAX_FINISHED_PROCESS_ON_RAM) {
+
+            finishedProcesses.push(toFinish);
+
+        } else {
+
+            StringBuilder overflowMsg = new StringBuilder();
+
+            while (!finishedProcesses.isEmpty()) {
+
+                Process overflow = finishedProcesses.pop();
+                Users user = (Users) userList.get(overflow.getUid());
+
+                overflowMsg.append(
+                        "PID=" + overflow.getPid()
+                                + " " + overflow.getName()
+                                + " | STATE: " + overflow.getFinishedType()
+                                + " | USER:" + user.getAlias()
+                                + " UID:" + overflow.getUid()
+                                + "\n"
+                );
+            }
+
+            writeLog("Finished process stack overflow");
+            writeLog(overflowMsg.toString());
+
+            finishedProcesses.push(toFinish);
+        }
+    }
+
     @Override
     public void loadProcessAndUserData(String processCsvPath, String usersCsvPath) {
         loadUsers(usersCsvPath);
@@ -201,12 +233,53 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void finishProcessError() {
-        System.out.println("IMPLEMENTAR");
+        //System.out.println("IMPLEMENTAR");
+        if (runningProcess.isEmpty()) {
+            System.out.println("No hay procesos ejecutándose.");
+            return;
+        }
+
+        Process toFinish = runningProcess.pop();
+
+        toFinish.setStatus("FINISHED");
+        toFinish.setFinishedType("ERROR");
+
+        saveFinishedProcess(toFinish);
+
+        writeLog(
+                "ENDING PROCESS: PID=" + toFinish.getPid()
+                        + " | STATE: ERROR"
+        );
     }
 
     @Override
     public void terminateProcess(int uid) {
-        System.out.println("IMPLEMENTAR");
+        //System.out.println("IMPLEMENTAR");
+        if (runningProcess.isEmpty()) {
+            System.out.println("No hay procesos ejecutándose.");
+            return;
+        }
+
+        Users killer = (Users) userList.get(uid);
+
+        if (killer == null) {
+            System.out.println("No existe un usuario con UID " + uid);
+            return;
+        }
+
+        Process toFinish = runningProcess.pop();
+
+        toFinish.setStatus("FINISHED");
+        toFinish.setFinishedType("TERMINATED");
+
+        saveFinishedProcess(toFinish);
+
+        writeLog(
+                "ENDING PROCESS: PID=" + toFinish.getPid()
+                        + " | STATE: TERMINATED"
+                        + " by USER:" + killer.getAlias()
+                        + " UID:" + killer.getUid()
+        );
     }
 
     @Override
