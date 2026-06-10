@@ -63,12 +63,13 @@ public class ProcessManagerImpl implements ProcessManager{
                                 + " | STATE: " + overflow.getFinishedType()
                                 + " | USER:" + user.getAlias()
                                 + " UID:" + overflow.getUid()
-                                + "\n"
                 );
+                if (!finishedProcesses.isEmpty()) {
+                    overflowMsg.append("\n");
+                }
             }
 
-            writeLog("Finished process stack overflow");
-            writeLog(overflowMsg.toString());
+            writeLog("Finished process stack overflow" + "\n" + overflowMsg);
 
             finishedProcesses.push(toFinish);
         }
@@ -187,7 +188,17 @@ public class ProcessManagerImpl implements ProcessManager{
             Process toRun = pendingProcesses.remove();
             toRun.setStatus("RUNNING");
             runningProcess.push(toRun);
-            //Implementar log
+
+            Users user = (Users) userList.get(toRun.getUid());
+            StringBuilder events = new StringBuilder();
+            for (int i = 0; i < toRun.getEvents().size(); i++) {
+                Events temp = toRun.getEvents().get(i);
+                events.append("EVENT: " + temp.getType() + "| Instructions " + temp.getInstructions().toString());
+                if (i != toRun.getEvents().size() -1) {
+                    events.append( "\n");
+                }
+            }
+            writeLog("EXECUTING PROCESS: PID=" + toRun.getPid() + " | USER:" + user.getAlias() + " UID:"+ user.getUid() + "\n" + events);
         } else {
             System.out.println("ERROR, no se puede ejecutar más de un programa a la vez.");
         }
@@ -197,43 +208,23 @@ public class ProcessManagerImpl implements ProcessManager{
     public void finishProcessOk() throws EmptyStackException {
         if (!runningProcess.isEmpty()) {
             Process toFinish = runningProcess.pop();
+
             toFinish.setStatus("FINISHED");
             toFinish.setFinishedType("OK");
 
-            if (finishedProcesses.size() < MAX_FINISHED_PROCESS_ON_RAM) {
-                finishedProcesses.push(toFinish);
-                Process toLog = finishedProcesses.peek();
+            saveFinishedProcess(toFinish);
 
-                writeLog(
-                        "ENDING PROCESS:" + toLog.getPid()
-                                + " | STATE: " + toLog.getFinishedType()
-                );
-            } else {
-                StringBuilder overflowMsg = new StringBuilder();
-                while (!finishedProcesses.isEmpty()) {
-                    Process overflow = finishedProcesses.pop();
-                    Users user = (Users) userList.get(overflow.getUid());
-                    String tempMsg = "PID=" + overflow.getPid() + " " + overflow.getName() + " | STATE: " + overflow.getFinishedType() + " | USER: " + user + " UID: " + overflow.getUid() + "/n";
-                    overflowMsg.append(tempMsg);
-                }
-                writeLog(String.valueOf(overflowMsg));
-
-                finishedProcesses.push(toFinish);
-                Process toLog = finishedProcesses.peek();
-
-                writeLog(
-                        "ENDING PROCESS:" + toLog.getPid()
-                                + " | STATE: " + toLog.getFinishedType()
-                );
-            }
+            writeLog(
+                    "ENDING PROCESS: PID=" + toFinish.getPid()
+                            + " | STATE: OK"
+            );
+        } else {
+            System.out.println("No hay procesos ejecutándose.");
         }
-
-        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
-    public void finishProcessError() {
-        //System.out.println("IMPLEMENTAR");
+    public void finishProcessError() throws EmptyStackException {
         if (runningProcess.isEmpty()) {
             System.out.println("No hay procesos ejecutándose.");
             return;
@@ -253,8 +244,7 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
     @Override
-    public void terminateProcess(int uid) {
-        //System.out.println("IMPLEMENTAR");
+    public void terminateProcess(int uid) throws EmptyStackException {
         if (runningProcess.isEmpty()) {
             System.out.println("No hay procesos ejecutándose.");
             return;
