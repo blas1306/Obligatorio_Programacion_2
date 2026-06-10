@@ -31,12 +31,27 @@ public class ProcessManagerImpl implements ProcessManager{
 
     //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
 
+    public ProcessManagerImpl() {
+        clearTodayLog();
+    }
+
+    private void clearTodayLog() {
+        String fileName = "DOORS_PROCESS_LOG_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        try (FileWriter writer = new FileWriter(fileName, false)) {
+            // Vacía el archivo al iniciar el sistema
+        } catch (IOException e) {
+            System.out.println("Error limpiando log: " + e.getMessage());
+        }
+    }
+
     private void writeLog(String message) {
         String fileName = "DOORS_PROCESS_LOG_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
         try (FileWriter writer = new FileWriter(fileName, true)) {
             writer.write("[" + timestamp + "]: " + message + System.lineSeparator());
+            writer.flush();
         } catch (IOException e) {
             System.out.println("Error escribiendo log: " + e.getMessage());
         }
@@ -72,6 +87,33 @@ public class ProcessManagerImpl implements ProcessManager{
             writeLog("Finished process stack overflow" + "\n" + overflowMsg);
 
             finishedProcesses.push(toFinish);
+        }
+    }
+
+    private String processBasic(Process process) {
+        Users user = (Users) userList.get(process.getUid());
+
+        return "PID=" + process.getPid()
+                + " | " + process.getName()
+                + " | USER:" + user.getAlias()
+                + " UID:" + user.getUid()
+                + " | P=" + process.getPriority();
+    }
+
+    private String processFinished(Process process) {
+        Users user = (Users) userList.get(process.getUid());
+
+        return "PID=" + process.getPid()
+                + " " + process.getName()
+                + " | STATE: " + process.getFinishedType()
+                + " | USER:" + user.getAlias()
+                + " UID:" + user.getUid();
+    }
+
+    private void printEvents(Process process) {
+        for (Events event : process.getEvents()) {
+            System.out.println("EVENT: " + event.getType()
+                    + " | Instructions " + event.getInstructions());
         }
     }
 
@@ -274,12 +316,85 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatus() {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS");
+
+        System.out.println("EXECUTING:");
+        if (runningProcess.isEmpty()) {
+            System.out.println("No hay procesos ejecutándose.");
+        } else {
+            System.out.println(processBasic(runningProcess.peek()));
+        }
+
+        System.out.println("PENDING:");
+        if (pendingProcesses.isEmpty()) {
+            System.out.println("No hay procesos pendientes.");
+        } else {
+            MyHeapImpl<Process> auxHeap = new MyHeapImpl<>(false);
+
+            while (!pendingProcesses.isEmpty()) {
+                Process process = pendingProcesses.remove();
+                System.out.println(processBasic(process));
+                auxHeap.insert(process);
+            }
+
+            while (!auxHeap.isEmpty()) {
+                pendingProcesses.insert(auxHeap.remove());
+            }
+        }
+
+        System.out.println("FINISHED:");
+        if (finishedProcesses.isEmpty()) {
+            System.out.println("No hay procesos finalizados.");
+        } else {
+            for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
+                System.out.println(processFinished(finishedProcesses.get(i)));
+            }
+        }
+        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
     public void printStatusVerbose() {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS - VERBOSE");
+
+        System.out.println("EXECUTING:");
+        if (runningProcess.isEmpty()) {
+            System.out.println("No hay procesos ejecutándose.");
+        } else {
+            Process process = runningProcess.peek();
+            System.out.println(processBasic(process));
+            printEvents(process);
+        }
+
+        System.out.println("PENDING:");
+        if (pendingProcesses.isEmpty()) {
+            System.out.println("No hay procesos pendientes.");
+        } else {
+            MyHeapImpl<Process> auxHeap = new MyHeapImpl<>(false);
+
+            while (!pendingProcesses.isEmpty()) {
+                Process process = pendingProcesses.remove();
+                System.out.println(processBasic(process));
+                printEvents(process);
+                auxHeap.insert(process);
+            }
+
+            while (!auxHeap.isEmpty()) {
+                pendingProcesses.insert(auxHeap.remove());
+            }
+        }
+
+        System.out.println("FINISHED:");
+        if (finishedProcesses.isEmpty()) {
+            System.out.println("No hay procesos finalizados.");
+        } else {
+            for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
+                Process process = finishedProcesses.get(i);
+                System.out.println(processFinished(process));
+                printEvents(process);
+            }
+        }
+        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
