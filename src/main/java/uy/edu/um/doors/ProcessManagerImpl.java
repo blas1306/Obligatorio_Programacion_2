@@ -399,7 +399,46 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatusByUser(int uid) {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS - By User");
+
+        if (!(runningProcess.isEmpty())) {
+
+            Process process = runningProcess.peek();
+            if (process.getUid()==uid){
+            System.out.println("Executing: " + processBasic(process));
+            //printEvents(process);
+            }
+        }
+
+
+
+        if (!pendingProcesses.isEmpty()) {
+            MyHeapImpl<Process> auxHeap = new MyHeapImpl<>(false);
+
+            while (!pendingProcesses.isEmpty()) {
+                Process process = pendingProcesses.remove();
+                if(process.getUid()==uid){
+                System.out.println("Pending: " + processBasic(process));
+                //printEvents(process);
+                }
+                auxHeap.insert(process);
+            }
+            while (!auxHeap.isEmpty()) {
+                pendingProcesses.insert(auxHeap.remove());
+            }
+        }
+
+
+        if (finishedProcesses.isEmpty()) {
+            for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
+                Process process = finishedProcesses.get(i);
+                if (process.getUid()==uid){
+                System.out.println("Finished: " + processFinished(process));
+                //printEvents(process);
+                }
+            }
+        }
+        System.out.println("Work in progress");
     }
 
     @Override
