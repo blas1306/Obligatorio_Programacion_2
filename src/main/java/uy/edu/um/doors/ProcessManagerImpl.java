@@ -29,7 +29,6 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyStackImpl<Process> runningProcess = new MyStackImpl<>();
     private MyStackImpl<Process> finishedProcesses = new MyStackImpl<>();
 
-    //EL DISEÑO DE LA ESTRUCTURA DE ALMACENAMIENTO DEBE IMPLEMENTARSE EN ESTA CLASE EN RELACIÓN CON LAS ENTIDADES QUE DEFINA
 
     public ProcessManagerImpl() {
         clearTodayLog();
@@ -350,7 +349,6 @@ public class ProcessManagerImpl implements ProcessManager{
                 System.out.println(processFinished(finishedProcesses.get(i)));
             }
         }
-        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
@@ -394,7 +392,6 @@ public class ProcessManagerImpl implements ProcessManager{
                 printEvents(process);
             }
         }
-        //System.out.println("IMPLEMENTAR");
     }
 
     @Override
@@ -406,7 +403,6 @@ public class ProcessManagerImpl implements ProcessManager{
             Process process = runningProcess.peek();
             if (process.getUid()==uid){
             System.out.println("Executing: " + processBasic(process));
-            //printEvents(process);
             }
         }
 
@@ -419,7 +415,6 @@ public class ProcessManagerImpl implements ProcessManager{
                 Process process = pendingProcesses.remove();
                 if(process.getUid()==uid){
                 System.out.println("Pending: " + processBasic(process));
-                //printEvents(process);
                 }
                 auxHeap.insert(process);
             }
@@ -434,7 +429,6 @@ public class ProcessManagerImpl implements ProcessManager{
                 Process process = finishedProcesses.get(i);
                 if (process.getUid()==uid){
                 System.out.println("Finished: " + processFinished(process));
-                //printEvents(process);
                 }
             }
         }
