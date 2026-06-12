@@ -15,7 +15,7 @@ public class Main {
         }catch (Exception e){
 
         }
-        helper.printStatusByUser(25);
+        helper.printStatusVerbose();
 
     }
 }
