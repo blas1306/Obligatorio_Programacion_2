@@ -26,7 +26,8 @@ public class ProcessManagerImpl implements ProcessManager{
 
     private MyQueueImpl<Process> newProcesses= new MyQueueImpl<>();
     private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl<>(false);
-    private MyStackImpl<Process> runningProcess = new MyStackImpl<>();
+    Process runningProcess=null;
+
     private MyStackImpl<Process> finishedProcesses = new MyStackImpl<>();
 
 
@@ -225,10 +226,10 @@ public class ProcessManagerImpl implements ProcessManager{
     @Override
     public void executeNextProcess() {
 
-        if (runningProcess.isEmpty()) {
+        if (runningProcess==null) {
             Process toRun = pendingProcesses.remove();
             toRun.setStatus("RUNNING");
-            runningProcess.push(toRun);
+            runningProcess= toRun;
 
             Users user = (Users) userList.get(toRun.getUid());
             StringBuilder events = new StringBuilder();
@@ -266,12 +267,13 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void finishProcessError() throws EmptyStackException {
-        if (runningProcess.isEmpty()) {
+        if (runningProcess==null) {
             System.out.println("No hay procesos ejecutándose.");
             return;
         }
 
-        Process toFinish = runningProcess.pop();
+        Process toFinish = runningProcess;
+        runningProcess=null;
 
         toFinish.setStatus("FINISHED");
         toFinish.setFinishedType("ERROR");
@@ -286,7 +288,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void terminateProcess(int uid) throws EmptyStackException {
-        if (runningProcess.isEmpty()) {
+        if (runningProcess==null) {
             System.out.println("No hay procesos ejecutándose.");
             return;
         }
@@ -298,7 +300,8 @@ public class ProcessManagerImpl implements ProcessManager{
             return;
         }
 
-        Process toFinish = runningProcess.pop();
+        Process toFinish = runningProcess;
+        runningProcess=null;
 
         toFinish.setStatus("FINISHED");
         toFinish.setFinishedType("TERMINATED");
@@ -318,10 +321,10 @@ public class ProcessManagerImpl implements ProcessManager{
         System.out.println("PROCESS STATUS");
 
         System.out.println("EXECUTING:");
-        if (runningProcess.isEmpty()) {
+        if (runningProcess==null) {
             System.out.println("No hay procesos ejecutándose.");
         } else {
-            System.out.println(processBasic(runningProcess.peek()));
+            System.out.println(processBasic(runningProcess));
         }
 
         System.out.println("PENDING:");
@@ -356,10 +359,10 @@ public class ProcessManagerImpl implements ProcessManager{
         System.out.println("PROCESS STATUS - VERBOSE");
 
         System.out.println("EXECUTING:");
-        if (runningProcess.isEmpty()) {
+        if (runningProcess==null) {
             System.out.println("No hay procesos ejecutándose.");
         } else {
-            Process process = runningProcess.peek();
+            Process process = runningProcess;
             System.out.println(processBasic(process));
             printEvents(process);
         }
