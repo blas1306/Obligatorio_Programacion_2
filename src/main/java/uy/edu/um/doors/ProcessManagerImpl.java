@@ -248,8 +248,9 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void finishProcessOk() throws EmptyStackException {
-        if (!runningProcess.isEmpty()) {
-            Process toFinish = runningProcess.pop();
+        if (runningProcess!=null) {
+            Process toFinish = runningProcess;
+            runningProcess=null;
 
             toFinish.setStatus("FINISHED");
             toFinish.setFinishedType("OK");
@@ -401,9 +402,9 @@ public class ProcessManagerImpl implements ProcessManager{
     public void printStatusByUser(int uid) {
         System.out.println("PROCESS STATUS - By User");
 
-        if (!(runningProcess.isEmpty())) {
+        if (!(runningProcess==null)) {
 
-            Process process = runningProcess.peek();
+            Process process = runningProcess;
             if (process.getUid()==uid){
             System.out.println("Executing: " + processBasic(process));
             }
