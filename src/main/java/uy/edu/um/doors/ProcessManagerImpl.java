@@ -27,7 +27,6 @@ public class ProcessManagerImpl implements ProcessManager{
     private MyQueueImpl<Process> newProcesses= new MyQueueImpl<>();
     private MyHeapImpl<Process> pendingProcesses = new MyHeapImpl<>(false);
     Process runningProcess=null;
-
     private MyStackImpl<Process> finishedProcesses = new MyStackImpl<>();
 
 
