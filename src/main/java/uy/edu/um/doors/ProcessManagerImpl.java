@@ -428,7 +428,7 @@ public class ProcessManagerImpl implements ProcessManager{
             }
         }
 
-       //¿ESTO NO ESTÁ INVERTIDO?
+        //Puede ser que esto este mal o no (probarlo)
         if (!finishedProcesses.isEmpty()) {
             for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
                 Process process = finishedProcesses.get(i);
@@ -446,7 +446,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
         Process found = null;
 
-        // Busca en el proceso en ejecución
+        // Busca el proceso en ejecución
         if (runningProcess != null && runningProcess.getPid() == pid) {
             found = runningProcess;
         }
