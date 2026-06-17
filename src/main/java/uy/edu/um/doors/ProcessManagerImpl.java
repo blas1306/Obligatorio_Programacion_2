@@ -499,4 +499,30 @@ public class ProcessManagerImpl implements ProcessManager{
 
     }
 
+
+    // Métodos para tests
+
+    public int getNewProcessesCount() {
+        return newProcesses.size();
+    }
+
+    public int getPendingProcessesCount() {
+        return pendingProcesses.size();
+    }
+
+    public Process getRunningProcess() {
+        return runningProcess;
+    }
+
+    public int getFinishedProcessesCount() {
+        return finishedProcesses.size();
+    }
+
+    public Process getLastFinishedProcess() {
+        if (finishedProcesses.isEmpty()) {
+            return null;
+        }
+        return finishedProcesses.get(finishedProcesses.size() - 1);
+    }
+
 }

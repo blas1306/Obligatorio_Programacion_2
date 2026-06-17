@@ -17,9 +17,8 @@ class MyLinkedListImplTest {
         list = new MyLinkedListImpl<>();
     }
 
-    // =========================================================
-    // isEmpty()
-    // =========================================================
+
+
     @Nested
     @DisplayName("isEmpty()")
     class IsEmptyTests {
