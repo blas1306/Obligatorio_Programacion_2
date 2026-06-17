@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import jdk.jfr.Event;
 import uy.edu.um.Exceptions.ProcessosYaEnSistemas;
 import uy.edu.um.Exceptions.UsuarioYaEnSistema;
 import uy.edu.um.tad.hash.MyHashImpl;
@@ -426,8 +427,8 @@ public class ProcessManagerImpl implements ProcessManager{
             }
         }
 
-
-        if (finishedProcesses.isEmpty()) {
+        //Puede ser que esto este mal o no (probarlo)
+        if (!finishedProcesses.isEmpty()) {
             for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
                 Process process = finishedProcesses.get(i);
                 if (process.getUid()==uid){
@@ -440,6 +441,62 @@ public class ProcessManagerImpl implements ProcessManager{
 
     @Override
     public void printStatusByProcess(int pid) {
-        System.out.println("IMPLEMENTAR");
+        System.out.println("PROCESS STATUS - By Process");
+
+        Process found = null;
+
+        // Busca el proceso en ejecución
+        if (runningProcess != null && runningProcess.getPid() == pid) {
+            found = runningProcess;
+        }
+
+        // Busca los pendientes
+        if (found == null && !pendingProcesses.isEmpty()) {
+            MyHeapImpl<Process> auxHeap = new MyHeapImpl<>(false);
+
+            while (!pendingProcesses.isEmpty()) {
+                Process process = pendingProcesses.remove();
+
+                if (process.getPid() == pid) {
+                    found = process;
+                }
+
+                auxHeap.insert(process);
+            }
+
+            // Restaura el heap
+            while (!auxHeap.isEmpty()) {
+                pendingProcesses.insert(auxHeap.remove());
+            }
+        }
+
+        // Busca los finalizados
+        if (found == null && !finishedProcesses.isEmpty()) {
+            for (int i = finishedProcesses.size() - 1; i >= 0; i--) {
+                Process process = finishedProcesses.get(i);
+
+                if (process.getPid() == pid) {
+                    found = process;
+                    break;
+                }
+            }
+        }
+
+        // Muestra la información
+        if (found == null) {
+            System.out.println("Process not found.");
+            return;
+        }
+
+        // Información completa del proceso
+        System.out.println(processFinished(found));
+
+        // Eventos asociados
+        System.out.println("EVENTS:");
+        for (Events event : found.getEvents()) {
+            System.out.println(event);
+        }
+
     }
+
 }
