@@ -416,7 +416,6 @@ public class ProcessManagerImpl implements ProcessManager{
                 }
             }
         }
-        System.out.println("Work in progress");
     }
 
     @Override

@@ -15,6 +15,11 @@ public class Events {
 
     }
 
+    @Override
+    public String toString() {
+        return "EVENT: " + type + " | Instructions " + instructions;
+    }
+
 
 
     public void setType(String type) {
