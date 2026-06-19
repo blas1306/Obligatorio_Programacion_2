@@ -93,27 +93,18 @@ public class ProcessManagerImpl implements ProcessManager{
     private String processBasic(Process process) {
         Users user = (Users) userList.get(process.getUid());
 
-        return "PID=" + process.getPid()
-                + " | " + process.getName()
-                + " | USER:" + user.getAlias()
-                + " UID:" + user.getUid()
-                + " | P=" + process.getPriority();
+        return "PID=" + process.getPid() + " | " + process.getName() + " | USER:" + user.getAlias() + " UID:" + user.getUid()+ " | P=" + process.getPriority();
     }
 
     private String processFinished(Process process) {
         Users user = (Users) userList.get(process.getUid());
 
-        return "PID=" + process.getPid()
-                + " " + process.getName()
-                + " | STATE: " + process.getFinishedType()
-                + " | USER:" + user.getAlias()
-                + " UID:" + user.getUid();
+        return "PID=" + process.getPid()+ " " + process.getName()+ " | STATE: " + process.getFinishedType()+ " | USER:" + user.getAlias() + " UID:" + user.getUid();
     }
 
     private void printEvents(Process process) {
         for (Events event : process.getEvents()) {
-            System.out.println("EVENT: " + event.getType()
-                    + " | Instructions " + event.getInstructions());
+            System.out.println("EVENT: " + event.getType()+ " | Instructions " + event.getInstructions());
         }
     }
 
@@ -134,10 +125,10 @@ public class ProcessManagerImpl implements ProcessManager{
                 ArrayList<Events> eventosTotales=new ArrayList<Events>();
                 String[] datos= linea.split(";");//Separa la linea por los punto y comas
                 String helper= datos[3].substring(1, datos[3].length() - 1); //le quita { }
-                String[] eventos= helper.split("#");
+                String[] eventos= helper.split("#");//separa por #
                 for (int i =0; i<eventos.length; i++){
-                    String[] evento = (eventos[i].split(":"));
-                    String sin=evento[1].substring(1, evento[1].length() - 1);
+                    String[] evento = (eventos[i].split(":"));//separa por :
+                    String sin=evento[1].substring(1, evento[1].length() - 1); //"Le quita el primer y ultimo "caracter" espacio
                     ArrayList<String> sub= new ArrayList<>(Arrays.asList(sin.split(", ")));
                     Events ev= new Events(evento[0],sub);
                     eventosTotales.add(ev);
@@ -212,11 +203,7 @@ public class ProcessManagerImpl implements ProcessManager{
             toPrepare.setStatus("PENDING");
 
             writeLog(
-                    "NEW PENDING PROCESS: PID=" + toPrepare.getPid()
-                            + " | " + toPrepare.getName()
-                            + " | USER:" + user.getAlias()
-                            + " UID:" + user.getUid()
-                            + " | P=" + toPrepare.getPriority()
+                    "NEW PENDING PROCESS: PID=" + toPrepare.getPid() + " | " + toPrepare.getName() + " | USER:" + user.getAlias() + " UID:" + user.getUid() + " | P=" + toPrepare.getPriority()
             );
 
             pendingProcesses.insert(toPrepare);
@@ -257,9 +244,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
             saveFinishedProcess(toFinish);
 
-            writeLog(
-                    "ENDING PROCESS: PID=" + toFinish.getPid()
-                            + " | STATE: OK"
+            writeLog("ENDING PROCESS: PID=" + toFinish.getPid() + " | STATE: OK"
             );
         } else {
             System.out.println("No hay procesos ejecutándose.");
@@ -281,9 +266,7 @@ public class ProcessManagerImpl implements ProcessManager{
 
         saveFinishedProcess(toFinish);
 
-        writeLog(
-                "ENDING PROCESS: PID=" + toFinish.getPid()
-                        + " | STATE: ERROR"
+        writeLog("ENDING PROCESS: PID=" + toFinish.getPid() + " | STATE: ERROR"
         );
     }
 
@@ -310,10 +293,7 @@ public class ProcessManagerImpl implements ProcessManager{
         saveFinishedProcess(toFinish);
 
         writeLog(
-                "ENDING PROCESS: PID=" + toFinish.getPid()
-                        + " | STATE: TERMINATED"
-                        + " by USER:" + killer.getAlias()
-                        + " UID:" + killer.getUid()
+                "ENDING PROCESS: PID=" + toFinish.getPid() + " | STATE: TERMINATED" + " by USER:" + killer.getAlias() + " UID:" + killer.getUid()
         );
     }
 
@@ -500,23 +480,27 @@ public class ProcessManagerImpl implements ProcessManager{
     }
 
 
-    // Métodos para tests
+    // Métodos para tests pq las cosas son privadas
 
-    public int getNewProcessesCount() {
+    public int getNewProcessesCant() {
         return newProcesses.size();
     }
 
-    public int getPendingProcessesCount() {
+    public int getPendingProcessesCant() {
         return pendingProcesses.size();
+    }
+    public Process getPendingProcessesLast() {
+        return pendingProcesses.get();
     }
 
     public Process getRunningProcess() {
         return runningProcess;
     }
 
-    public int getFinishedProcessesCount() {
+    public int getFinishedProcessesCant() {
         return finishedProcesses.size();
     }
+
 
     public Process getLastFinishedProcess() {
         if (finishedProcesses.isEmpty()) {
